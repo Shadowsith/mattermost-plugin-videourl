@@ -1,0 +1,4 @@
+/dist
+/node_modules
+/mattermost-mp4url-plugin
+*.tar.gz
