@@ -1,3 +1,5 @@
+mkdir -p dist
+npm install
 ./node_modules/.bin/webpack --mode=production
 rm -f mattermost-mp4url-plugin.tar.gz
 rm -rf mattermost-mp4url-plugin
