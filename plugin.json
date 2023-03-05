@@ -4,12 +4,41 @@
     "description": "Mattermost web app plugin to have a native HTML5 video player for .mp4 urls",
     "homepage_url": "https://github.com/Shadowsith/mattermost-plugin-mp4url",
     "support_url": "https://github.com/Shadowsith/mattermost-plugin-mp4url/issues",
-    "release_notes_url": "https://github.com/Shadowsith/mattermost-plugin-mp4url/releases/tag/1.0.1",
-    "version": "1.0.1",
+    "release_notes_url": "https://github.com/Shadowsith/mattermost-plugin-mp4url/releases/tag/1.1.0",
+    "version": "1.1.0",
+    "min_server_version": "6.2.1",
+    "server": {
+        "executables": {
+            "linux-amd64": "server/plugin-linux-amd64",
+            "darwin-amd64": "server/plugin-darwin-amd64",
+            "windows-amd64": "server/plugin-windows-amd64.exe"
+        }
+    },
     "webapp": {
-        "bundle_path": "main.js"
+        "bundle_path": "client/main.js"
+    },
+    "settings_schema": {
+        "header": "Mp4Url settings",
+        "footer": "Please report problems with the plugin at: https://github.com/Shadowsith/mattermost-plugin-mp4url/issues",
+        "settings": [
+            {
+                "key": "maxheight",
+                "display_name": "img/video max height",
+                "type": "number",
+                "help_text": "Set max height of image or video element in chat",
+                "default": "350"
+            },
+            {
+                "key": "blacklist",
+                "display_name": "Blacklist urls",
+                "type": "longtext",
+                "help_text": "Ignore urls or part of urls which are listed in the blacklist. Url parts must be comma separated.",
+                "default": ""
+            }
+        ]
     },
     "props": {
-        "maxHeight": 350
+        "maxHeight": 350,
+        "blacklist": ""
     }
 }
