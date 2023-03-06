@@ -1,5 +1,5 @@
 {
-    "name": "mattermost-mp4url",
+    "name": "mattermost-videourl",
     "version": "1.0.0",
     "description": "",
     "main": "webpack.config.js",

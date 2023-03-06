@@ -1,4 +1,4 @@
-module mattermost-plugin-mp4url
+module mattermost-plugin-videourl
 
 go 1.20
 

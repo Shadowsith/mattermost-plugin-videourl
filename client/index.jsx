@@ -8,6 +8,30 @@ class PluginSettings {
          */
         this.maxHeight = data.maxHeight;
         /**
+         * @type {boolean}
+         */
+        this.mp4 = data.mp4 == null ? true : data.mp4;
+        /**
+         * @type {boolean}
+         */
+        this.webm = data.webm == null ? true : data.webm;
+        /**
+         * @type {boolean}
+         */
+        this.mov = data.mov == null ? true : data.mov;
+        /**
+         * @type {boolean}
+         */
+        this.avi = data.avi == null ? true : data.avi;
+        /**
+         * @type {boolean}
+         */
+        this.wmv = data.wmv == null ? true : data.wmv;
+        /**
+         * @type {boolean}
+         */
+        this.ogv = data.ogv == null ? true : data.ogv;
+        /**
          * @type {string[]}
          */
         this.blacklist = null;
@@ -37,28 +61,60 @@ class PostWillRenderEmbed extends React.Component {
         } catch {
         }
         const css = `
-            .mp4url-mh {
+            .videourl-mh {
                 max-height: ${maxHeight}px;
             }`
+        
+        const fileType = this.getVideoUrlType(this.props.embed.url);
 
         return (
             <div>
                 <style>{css}</style>
-                <video controls="true" class="mp4url-mh">
-                    <source src={this.props.embed.url} type="video/mp4" />
+                <video controls="true" class="videourl-mh">
+                    <source src={this.props.embed.url} type={fileType} />
+                    Your browser does not support the video tag.
                 </video>
             </div>
         );
     }
+
+    /**
+     * 
+     * @param {string} url 
+     * @returns string
+     */
+    getVideoUrlType(url) {
+        const split = url.split('.');
+        switch (split[split.length - 1]) {
+            case 'webm':
+                return 'video/mp4';
+
+            case 'mov':
+                return 'video/quicktime';
+
+            case 'avi':
+                return 'video/x-msvideo';
+
+            case 'wmv':
+                return 'video/x-ms-wmv';
+
+            case 'ogv':
+                return 'video/ogv';
+
+            case 'mp4':
+            default:
+                return 'video/mp4';
+        }
+    }
 }
 
-class Mp4UrlPlugin {
-    static apiUrl = '/plugins/mp4url';
+class VideoUrlPlugin {
+    static apiUrl = '/plugins/videourl';
 
     initialize(registry, store) {
-        const plugin = store.getState().plugins.plugins.mp4url;
+        const plugin = store.getState().plugins.plugins.videourl;
         PostWillRenderEmbed.plugin = plugin;
-        axios.get(`${Mp4UrlPlugin.apiUrl}/settings`)
+        axios.get(`${VideoUrlPlugin.apiUrl}/settings`)
             .then(res => {
                 /**
                  * @type {PluginSettings}
@@ -68,14 +124,20 @@ class Mp4UrlPlugin {
                 registry.registerPostWillRenderEmbedComponent(
                     (embed) => {
                         const url = embed.url;
-                        if (embed.type == 'link' && url.includes('.mp4')) {
+                        const isFileSupported = (
+                            (url.includes('.mp4') && settings.mp4)
+                            || (url.includes('.webm') && settings.webm)
+                            || (url.includes('.mov') && settings.mov)
+                            || (url.includes('.avi') && settings.avi)
+                            || (url.includes('.wmv') && settings.wmv)
+                            || (url.includes('.ogv') && settings.ogv)
+                        );
+                        if (embed.type == 'link' && isFileSupported) {
                             if (settings.blacklist != null) {
-                                console.log('Blacklist', settings, url);
                                 const blacklisted = settings.blacklist.find(x => {
                                     return url.includes(x);
                                 });
                                 if (blacklisted != null) {
-                                    console.log('Blacklist here');
                                     return false;
                                 }
                             }
@@ -88,10 +150,17 @@ class Mp4UrlPlugin {
                 );
             })
             .catch(err => {
-                console.log('Mp4Url Settings Err', err);
+                console.log('VideoUrl Settings Err', err);
                 registry.registerPostWillRenderEmbedComponent(
                     (embed) => {
-                        if (embed.type == 'link' && embed.url.includes('.mp4')) {
+                        if (embed.type == 'link'
+                            && embed.url.includes('.mp4')
+                            && embed.url.includes('.webm')
+                            && embed.url.includes('.mov')
+                            && embed.url.includes('.avi')
+                            && embed.url.includes('.wmv')
+                            && embed.url.includes('.ogv')
+                        ) {
                             return true;
                         }
                         return false;
@@ -107,4 +176,4 @@ class Mp4UrlPlugin {
     }
 }
 
-window.registerPlugin('mp4url', new Mp4UrlPlugin());
+window.registerPlugin('videourl', new VideoUrlPlugin());
