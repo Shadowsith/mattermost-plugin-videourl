@@ -64,7 +64,7 @@ class PostWillRenderEmbed extends React.Component {
             .videourl-mh {
                 max-height: ${maxHeight}px;
             }`
-        
+
         const fileType = this.getVideoUrlType(this.props.embed.url);
 
         return (
@@ -84,26 +84,30 @@ class PostWillRenderEmbed extends React.Component {
      * @returns string
      */
     getVideoUrlType(url) {
-        const split = url.split('.');
-        switch (split[split.length - 1]) {
-            case 'webm':
-                return 'video/mp4';
+        try {
+            const split = url.split('.');
+            switch (split[split.length - 1]) {
+                case 'webm':
+                    return 'video/mp4';
 
-            case 'mov':
-                return 'video/quicktime';
+                case 'mov':
+                    return 'video/quicktime';
 
-            case 'avi':
-                return 'video/x-msvideo';
+                case 'avi':
+                    return 'video/x-msvideo';
 
-            case 'wmv':
-                return 'video/x-ms-wmv';
+                case 'wmv':
+                    return 'video/x-ms-wmv';
 
-            case 'ogv':
-                return 'video/ogv';
+                case 'ogv':
+                    return 'video/ogv';
 
-            case 'mp4':
-            default:
-                return 'video/mp4';
+                case 'mp4':
+                default:
+                    return 'video/mp4';
+            }
+        } catch {
+            return 'video/mp4';
         }
     }
 }
@@ -123,27 +127,31 @@ class VideoUrlPlugin {
                 PostWillRenderEmbed.settings = settings;
                 registry.registerPostWillRenderEmbedComponent(
                     (embed) => {
-                        const url = embed.url;
-                        const isFileSupported = (
-                            (url.includes('.mp4') && settings.mp4)
-                            || (url.includes('.webm') && settings.webm)
-                            || (url.includes('.mov') && settings.mov)
-                            || (url.includes('.avi') && settings.avi)
-                            || (url.includes('.wmv') && settings.wmv)
-                            || (url.includes('.ogv') && settings.ogv)
-                        );
-                        if (embed.type == 'link' && isFileSupported) {
-                            if (settings.blacklist != null) {
-                                const blacklisted = settings.blacklist.find(x => {
-                                    return url.includes(x);
-                                });
-                                if (blacklisted != null) {
-                                    return false;
+                        try {
+                            const url = embed.url;
+                            const isFileSupported = (
+                                (url.includes('.mp4') && settings.mp4)
+                                || (url.includes('.webm') && settings.webm)
+                                || (url.includes('.mov') && settings.mov)
+                                || (url.includes('.avi') && settings.avi)
+                                || (url.includes('.wmv') && settings.wmv)
+                                || (url.includes('.ogv') && settings.ogv)
+                            );
+                            if (embed.type == 'link' && isFileSupported) {
+                                if (settings.blacklist != null) {
+                                    const blacklisted = settings.blacklist.find(x => {
+                                        return url.includes(x);
+                                    });
+                                    if (blacklisted != null) {
+                                        return false;
+                                    }
                                 }
+                                return true;
                             }
-                            return true;
+                            return false;
+                        } catch {
+                            return false;
                         }
-                        return false;
                     },
                     PostWillRenderEmbed,
                     false,
@@ -153,17 +161,21 @@ class VideoUrlPlugin {
                 console.log('VideoUrl Settings Err', err);
                 registry.registerPostWillRenderEmbedComponent(
                     (embed) => {
-                        if (embed.type == 'link'
-                            && embed.url.includes('.mp4')
-                            && embed.url.includes('.webm')
-                            && embed.url.includes('.mov')
-                            && embed.url.includes('.avi')
-                            && embed.url.includes('.wmv')
-                            && embed.url.includes('.ogv')
-                        ) {
-                            return true;
+                        try {
+                            if (embed.type == 'link'
+                                && embed.url.includes('.mp4')
+                                && embed.url.includes('.webm')
+                                && embed.url.includes('.mov')
+                                && embed.url.includes('.avi')
+                                && embed.url.includes('.wmv')
+                                && embed.url.includes('.ogv')
+                            ) {
+                                return true;
+                            }
+                            return false;
+                        } catch {
+                            return false;
                         }
-                        return false;
                     },
                     PostWillRenderEmbed,
                     false,
